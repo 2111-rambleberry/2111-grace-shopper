@@ -1,35 +1,42 @@
 import React from "react";
 //import { Link } from 'react-router-dom';
-import { connect } from "react-redux";
-import { fetchSingleBook } from "../store/singleBook";
-
+import { connect } from 'react-redux';
+import { fetchSingleBook } from '../store/singleBook';
+import { addItemThunk } from '../store/cart'
 class SingleBook extends React.Component {
-  componentDidMount() {
-    this.props.fetchSingleBook(this.props.match.params.bookId);
-  }
+    constructor(){
+		super()
+		this.state = {
+			clicked: false
+		}
+		this.handleClick = this.handleClick.bind(this)
+	}
 
-  render() {
-    const book = this.props.book || {};
-    const { title, coverimg } = book;
-    console.log(this.props);
-    //console.log(this.state)
+    async handleClick(event, item){
+		event.preventDefault();
+    this.props.addToCart(item)
+		this.setState({
+			clicked: true
+		})
+	}
 
-    return (
-      <div>
-        <h1>{title}</h1>
-        <p>{book.author}</p>
-        <img src={coverimg} style={{ width: "220px", height: "350px" }} />
-        <p> Description: {book.description}</p>
-        <h4>${book.price ? book.price / 100 : 5}</h4>
-        <button
-          type="button"
-          onClick={() => console.log("Come back here and add functionality!")}
-        >
-          Add to Cart
-        </button>
-      </div>
-    );
-  }
+  render(){
+        const book = this.props.book || {};
+        const {title, coverimg} = book
+        console.log(this.props)
+        //console.log(this.state)
+
+        return(
+            <div>
+                <h1>{title}</h1>
+                <p>{book.author}</p>
+                <img src = {coverimg} style = {{width: "220px", height: "350px"}} />
+                <p> Description: {book.description}</p>
+                <h4>${book.price ? book.price/100 : 5}</h4>
+                <button type="button" onClick={(event) => this.handleClick(event, this.props.product)}>Add To Cart</button>
+            </div>
+        )
+    }
 }
 
 //book has a bought property that once it is bought it is true. (keep in mind for button)
@@ -39,7 +46,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  fetchSingleBook: (bookId) => dispatch(fetchSingleBook(bookId)),
-});
+    fetchSingleBook: (bookId) => dispatch(fetchSingleBook(bookId)),
+    addToCart: (item) => dispatch(addItemThunk(item))
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(SingleBook);
